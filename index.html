@@ -421,4 +421,254 @@ textarea, input { font: inherit; color: inherit; }
     <!-- 검색바 (list/fav 뷰) -->
     <div id="search-bar">
       <input id="search-input" placeholder="🔍  메모 검색..." oninput="renderList()"/>
-    </di
+    </div>
+
+    <!-- 카테고리 필터 바 -->
+    <div id="cat-bar"></div>
+
+    <!-- 리스트 뷰 -->
+    <div id="list"></div>
+
+    <!-- 캘린더 뷰 -->
+    <div id="cal-view">
+      <div id="cal-header">
+        <button class="cal-nav" onclick="changeMonth(-1)">‹</button>
+        <h2 id="cal-title"></h2>
+        <button class="cal-nav" onclick="changeMonth(1)">›</button>
+      </div>
+      <div id="cal-grid"></div>
+      <div id="cal-selected-label"></div>
+      <div id="cal-items"></div>
+    </div>
+
+    <!-- 즐겨찾기 뷰 -->
+    <div id="fav-view"></div>
+
+    <!-- 설정 뷰 -->
+    <div id="settings-view">
+      <div class="setting-section">
+        <div class="setting-section-title">카테고리 관리</div>
+        <div id="cat-list-manage"></div>
+        <div class="color-picker-row" id="color-picker-row"></div>
+        <div class="add-cat-row">
+          <input class="add-cat-input" id="new-cat-name" placeholder="새 카테고리 이름..."/>
+          <button class="add-cat-btn" onclick="addCategory()">추가</button>
+        </div>
+      </div>
+      <div class="setting-section">
+        <div class="setting-section-title">보기 옵션</div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">완료 항목 숨기기</div>
+            <div class="setting-desc">완료된 메모를 목록에서 숨깁니다</div>
+          </div>
+          <div class="toggle" id="toggle-done" onclick="toggleSetting('hideDone')"></div>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">날짜 구분선 표시</div>
+            <div class="setting-desc">날짜별로 메모를 구분하여 표시합니다</div>
+          </div>
+          <div class="toggle on" id="toggle-divider" onclick="toggleSetting('showDivider')"></div>
+        </div>
+      </div>
+      <div class="setting-section">
+        <div class="setting-section-title">데이터</div>
+        <div class="setting-row">
+          <div class="setting-label">전체 데이터 초기화</div>
+          <button onclick="resetAll()" style="padding:4px 12px;border-radius:8px;font-size:12px;border:1px solid rgba(239,68,68,.4);color:#f87171;background:rgba(239,68,68,.08);">초기화</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 입력 영역 -->
+    <div id="input-area">
+      <!-- 카테고리 팝업 -->
+      <div id="cat-popup">
+        <div class="popup-tabs">
+          <button class="popup-tab active" id="pt-todo" onclick="setInputType('todo')">📋 할일</button>
+          <button class="popup-tab" id="pt-memo" onclick="setInputType('memo')">📝 기록</button>
+        </div>
+        <div class="popup-label">카테고리 선택</div>
+        <div class="popup-cats" id="popup-cats"></div>
+      </div>
+
+      <!-- 선택된 태그 미리보기 -->
+      <div class="tag-preview" id="tag-preview"></div>
+
+      <!-- 마감일 바 -->
+      <div id="deadline-bar" style="display:none;">
+        <label>📅 마감일</label>
+        <input type="date" id="dl-date-input" oninput="updateDeadlinePreview()"/>
+        <input type="time" id="dl-time-input" oninput="updateDeadlinePreview()"/>
+        <button id="dl-clear-btn" onclick="clearDeadline()">✕ 제거</button>
+      </div>
+
+      <!-- 입력창 -->
+      <div class="input-row">
+        <button onclick="toggleCatPopup()" title="카테고리 선택"
+          style="font-size:20px;color:#555;transition:color .15s;flex-shrink:0;"
+          onmouseover="this.style.color='#aaa'" onmouseout="this.style.color='#555'">⊕</button>
+        <textarea id="text-input" placeholder="메모를 입력하세요... (Shift+Enter: 줄바꿈)" rows="1"
+          oninput="autoResize(this);checkSendBtn()" onkeydown="handleKey(event)"></textarea>
+        <button id="send-btn" onclick="sendMemo()" disabled>전송</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ── 데이터 ──────────────────────────────────────────────────────────────────
+const STORAGE_KEY = 'talkmemo_v2';
+const CAT_KEY     = 'talkmemo_cats_v2';
+const SET_KEY     = 'talkmemo_settings';
+
+const CAT_COLORS = [
+  '#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6',
+  '#ec4899','#06b6d4','#84cc16','#f97316','#6366f1'
+];
+
+let items = [];
+let categories = [];
+let settings = { hideDone: false, showDivider: true };
+
+let selectedCats  = [];
+let selectedType  = 'todo';
+let deadlineDate  = '';
+let deadlineTime  = '';
+let filterDoneOnly = false;
+let filterCat     = 'all';
+let currentView   = 'list';
+let calYear, calMonth, calSelectedDate;
+let newCatColor   = CAT_COLORS[0];
+
+function load() {
+  try { items      = JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch { items = []; }
+  try { categories = JSON.parse(localStorage.getItem(CAT_KEY))     || defaultCats(); } catch { categories = defaultCats(); }
+  try { const s = JSON.parse(localStorage.getItem(SET_KEY)); if(s) settings = {...settings,...s}; } catch {}
+}
+function save() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+  localStorage.setItem(CAT_KEY,     JSON.stringify(categories));
+  localStorage.setItem(SET_KEY,     JSON.stringify(settings));
+}
+function defaultCats() {
+  return [
+    { id:'미지정', name:'미지정', color:'#555' },
+    { id:'직장',   name:'직장',   color:'#3b82f6' },
+    { id:'개인',   name:'개인',   color:'#10b981' },
+    { id:'학교',   name:'학교',   color:'#f59e0b' },
+    { id:'약속',   name:'약속',   color:'#ef4444' },
+    { id:'집안일', name:'집안일', color:'#8b5cf6' },
+    { id:'과제',   name:'과제',   color:'#ec4899' },
+  ];
+}
+function getCat(id) { return categories.find(c => c.id === id) || {name:id, color:'#555'}; }
+
+// ── 뷰 전환 ──────────────────────────────────────────────────────────────────
+function switchView(v) {
+  currentView = v;
+  document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('btn-'+v)?.classList.add('active');
+
+  const listEl     = document.getElementById('list');
+  const calEl      = document.getElementById('cal-view');
+  const favEl      = document.getElementById('fav-view');
+  const settingsEl = document.getElementById('settings-view');
+  const inputEl    = document.getElementById('input-area');
+  const searchEl   = document.getElementById('search-bar');
+  const catBarEl   = document.getElementById('cat-bar');
+  const headerEl   = document.getElementById('header');
+  const filterBtn  = document.getElementById('filter-btn');
+
+  listEl.style.display     = 'none';
+  calEl.classList.remove('show');
+  favEl.classList.remove('show');
+  settingsEl.classList.remove('show');
+
+  if (v === 'list') {
+    listEl.style.display = 'block';
+    inputEl.style.display = '';
+    searchEl.style.display = '';
+    catBarEl.style.display = '';
+    filterBtn.style.display = '';
+    document.getElementById('view-title').textContent = '전체 메모';
+    renderCatBar(); renderList();
+  } else if (v === 'cal') {
+    calEl.classList.add('show');
+    inputEl.style.display = 'none';
+    searchEl.style.display = 'none';
+    catBarEl.style.display = 'none';
+    filterBtn.style.display = 'none';
+    document.getElementById('view-title').textContent = '캘린더';
+    renderCalendar();
+  } else if (v === 'fav') {
+    favEl.classList.add('show');
+    inputEl.style.display = '';
+    searchEl.style.display = '';
+    catBarEl.style.display = 'none';
+    filterBtn.style.display = 'none';
+    document.getElementById('view-title').textContent = '즐겨찾기';
+    renderFav();
+  } else if (v === 'settings') {
+    settingsEl.classList.add('show');
+    inputEl.style.display = 'none';
+    searchEl.style.display = 'none';
+    catBarEl.style.display = 'none';
+    filterBtn.style.display = 'none';
+    document.getElementById('view-title').textContent = '설정';
+    renderSettings();
+  }
+  updateStatBadge();
+}
+
+// ── 카테고리 바 ──────────────────────────────────────────────────────────────
+function renderCatBar() {
+  const bar = document.getElementById('cat-bar');
+  bar.innerHTML = '';
+  const all = document.createElement('button');
+  all.className = 'cat-filter-btn' + (filterCat === 'all' ? ' active' : '');
+  all.innerHTML = '전체';
+  all.style.borderColor = filterCat === 'all' ? '#3b82f6' : 'transparent';
+  all.onclick = () => { filterCat = 'all'; renderCatBar(); renderList(); };
+  bar.appendChild(all);
+
+  categories.forEach(c => {
+    const btn = document.createElement('button');
+    btn.className = 'cat-filter-btn' + (filterCat === c.id ? ' active' : '');
+    btn.style.borderColor = filterCat === c.id ? c.color : 'transparent';
+    btn.style.color = filterCat === c.id ? c.color : '';
+    btn.innerHTML = `<span class="cat-dot" style="background:${c.color}"></span>${c.name}`;
+    btn.onclick = () => { filterCat = c.id; renderCatBar(); renderList(); };
+    bar.appendChild(btn);
+  });
+}
+
+// ── 리스트 렌더 ──────────────────────────────────────────────────────────────
+function renderList() {
+  const container = document.getElementById('list');
+  const searchVal = document.getElementById('search-input').value.toLowerCase();
+  let filtered = items.filter(it => {
+    if (filterDoneOnly && it.done) return false;
+    if (settings.hideDone && it.done) return false;
+    if (filterCat !== 'all' && !it.cats.includes(filterCat)) return false;
+    if (searchVal && !it.text.toLowerCase().includes(searchVal)) return false;
+    return true;
+  });
+
+  updateStatBadge();
+
+  if (filtered.length === 0) {
+    container.innerHTML = `<div class="empty-state">
+      <div class="big">💬</div>
+      <p>메모가 없어요</p>
+      <p>아래 입력창에서 메모를 추가해보세요</p>
+    </div>`;
+    return;
+  }
+
+  let html = '';
+  let lastDate = null;
+  filtered.slice().reverse().forEach(it => {
+    const d = new Date(it.

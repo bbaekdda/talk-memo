@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+
+<head>
+
+<meta charset="UTF-8"/>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<title>톡메모 - 채팅처럼 간편한 메모</title>
+
+<style>
+
+, ::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body, #app { height: 100%; }
+
+body {
+
+  font-family: 'Apple SD Gothic Neo','Pretendard','Malgun Gothic',sans-serif;
+
+  background: #111; color: #fff; font-size: 14px;
+
+}
+
+button { border: none; cursor: pointer; background: none; color: inherit; font: inherit; }
+
+textarea, input { font: inherit; color: inherit; }
+
+::-webkit-scrollbar { width: 4px; }
+
+::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
+
+/* ── 레이아웃 ── */
+
+#app { display: flex; height: 100vh; overflow: hidden; }
+
+/* ── 사이드바 ── */
+
+#sidebar {
+
+  width: 56px; flex-shrink: 0; background: #0d0d0d;
+
+  border-right: 1px solid #1e1e1e;
+
+  display: flex; flex-direction: column; align-items: center;
+
+  padding: 12px 0; gap: 6px;
+
+}
+
+.logo-btn {
+
+  width: 36px; height: 36px; background: #1e40af;
+
+  border-radius: 12px; display: flex; align-items: center;
+
+  justify-content: center; font-size: 18px; margin-bottom: 8px;
+
+  flex-shrink: 0;
+
+}
+
+.sidebar-btn {
+
+  width: 40px; height: 40px; border-radius: 12px;
+
+  display: flex; align-items: center; justify-content: center;
+
+  font-size: 18px; color: #666; transition: all .15s; position: relative;
+
+}
+
+.sidebar-btn:hover { background: #1e1e1e; color: #ccc; }
+
+.sidebar-btn.active { background: #1e3a8a; color: #93c5fd; }
+
+.sidebar-spacer { flex: 1; }
+
+.badge {
+
+  position: absolute; top: -3px; right: -3px;
+
+  min-width: 16px; height: 16px; background: #3b82f6;
+
+  border-radius: 8px; font-size: 9px; font-weight: 700;
+
+  color: #fff; display: flex; align-items: center;
+
+  justify-content: center; padding: 0 3px;
+
+}
+
+/* ── 메인 ── */
+
+#main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+
+/* ── 헤더 ── */
+
+#header {
+
+  flex-shrink: 0; display: flex; align-items: center; gap: 10px;
+
+  padding: 10px 16px; border-bottom: 1px solid #1e1e1e; background: #111;
+
+}
+
+#header h1 { font-size: 15px; font-weight: 700; }
+
+.stat-badge {
+
+  padding: 2px 10px; border-radius: 20px; font-size: 11px;
+
+  background: #1e1e1e; color: #888; border: 1px solid #2a2a2a;
+
+}
+
+#header-spacer { flex: 1; }
+
+#filter-btn {
+
+  padding: 4px 10px; border-radius: 8px; font-size: 11px;
+
+  border: 1px solid #2a2a2a; color: #666; transition: all .15s;
+
+}
+
+#filter-btn:hover { color: #ccc; border-color: #444; }
+
+#filter-btn.on {
+
+  background: rgba(59,130,246,.15); border-color: rgba(59,130,246,.4); color: #93c5fd;
+
+}
+
+/* ── 카테고리 바 ── */
+
+#cat-bar {
+
+  flex-shrink: 0; display: flex; align-items: center;
+
+  gap: 6px; padding: 8px 16px; overflow-x: auto;
+
+  border-bottom: 1px solid #1a1a1a;
+
+}
+
+#cat-bar::-webkit-scrollbar { display: none; }
+
+.cat-filter-btn {
+
+  display: flex; align-items: center; gap: 5px;
+
+  padding: 3px 10px; border-radius: 20px; font-size: 12px;
+
+  white-space: nowrap; border: 1px solid transparent;
+
+  color: #666; transition: all .15s;
+
+}
+
+.cat-filter-btn:hover { color: #ccc; }
+
+.cat-filter-btn.active { color: #fff; }
+
+.cat-dot { width: 6px; height: 6px; border-radius: 50%; }
+
+/* ── 리스트 ── */
+
+#list { flex: 1; overflow-y: auto; padding: 8px 16px; }
+
+.empty-state {
+
+  display: flex; flex-direction: column; align-items: center;
+
+  justify-content: center; height: 100%; color: #444; text-align: center;
+
+}
+
+.empty-state .big { font-size: 48px; margin-bottom: 12px; }
+
+.empty-state p { font-size: 13px; margin-top: 4px; }
+
+/* 날짜 구분선 */
+
+.date-divider {
+
+  display: flex; align-items: center; gap: 10px; margin: 16px 0;
+
+}
+
+.date-divider::before, .date-divider::after {
+
+  content: ''; flex: 1; height: 1px; background: #222;
+
+}
+
+.date-divider span { font-size: 11px; color: #555; }
+
+/* ── 카드 ── */
+
+.item-card {
+
+  position: relative; border-radius: 14px;
+
+  background: #1a1a1a; border: 1px solid #252525;
+
+  margin-bottom: 10px; overflow: hidden;
+
+  animation: fadeUp .2s ease; transition: border-color .15s;
+
+}
+
+.item-card:hover { border-color: #333; }
+
+.item-card.done { opacity: .5; }
+
+@keyframes fadeUp {
+
+  from { opacity: 0; transform: translateY(8px); }
+
+  to   { opacity: 1; transform: translateY(0); }
+
+}
+
+.color-bar { position: absolute; left: 0; top: 0; bottom: 0; width: 3px; }
+
+.card-inner {
+
+  padding: 10px 12px 10px 14px;
+
+  display: flex; align-items: flex-start; gap: 8px;
+
+}
+
+.check-btn {
+
+  width: 20px; height: 20px; border-radius: 50%;
+
+  border: 2px solid #555; flex-shrink: 0; margin-top: 1px;
+
+  display: flex; align-items: center; justify-content: center;
+
+  font-size: 10px; transition: all .15s;
+
+}
+
+.check-btn:hover { border-color: #888; }
+
+.check-btn.checked { border-color: transparent; color: #fff; }
+
+.memo-icon { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+
+.card-body { flex: 1; min-width: 0; }
+
+.card-text {
+
+  font-size: 13px; line-height: 1.6; white-space: pre-wrap;
+
+  word-break: break-all; color: #e5e5e5;
+
+}
+
+.card-text.done-text { text-decoration: line-through; color: #555; }
+
+.tag-row { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+
+.tag-pill {
+
+  padding: 1px 8px; border-radius: 20px; font-size: 11px; font-weight: 500;
+
+}
+
+.deadline-badge {
+
+  display: inline-flex; align-items: center; gap: 4px;
+
+  padding: 2px 9px; border-radius: 20px; font-size: 11px;
+
+  margin-top: 5px;
+
+}
+
+.deadline-badge.overdue  { background: rgba(239,68,68,.15);  color: #f87171; border: 1px solid rgba(239,68,68,.3); }
+
+.deadline-badge.today    { background: rgba(251,191,36,.15); color: #fbbf24; border: 1px solid rgba(251,191,36,.3); }
+
+.deadline-badge.upcoming { background: rgba(59,130,246,.12); color: #93c5fd; border: 1px solid rgba(59,130,246,.3); }
+
+.card-meta {
+
+  display: flex; align-items: center; gap: 8px; margin-top: 6px; flex-wrap: wrap;
+
+}
+
+.meta-cat {
+
+  display: flex; align-items: center; gap: 4px; font-size: 11px; color: #666;
+
+}
+
+.meta-dot { width: 5px; height: 5px; border-radius: 50%; }
+
+.meta-time { font-size: 11px; color: #444; }
+
+.card-actions {
+
+  display: flex; flex-direction: column; gap: 4px;
+
+  opacity: 0; transition: opacity .15s;
+
+}
+
+.item-card:hover .card-actions { opacity: 1; }
+
+.action-btn { font-size: 14px; padding: 2px; transition: color .15s; }
+
+.action-btn.fav { color: #666; }
+
+.action-btn.fav.on { color: #fbbf24; }
+
+.action-btn.del { color: #444; }
+
+.action-btn.del:hover { color: #ef4444; }
+
+/* ── 입력 영역 ── */
+
+#input-area {
+
+  flex-shrink: 0; border-top: 1px solid #1e1e1e;
+
+  background: #111; padding: 10px 14px; position: relative;
+
+}
+
+.tag-preview { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; }
+
+.preview-tag {
+
+  display: flex; align-items: center; gap: 4px;
+
+  padding: 2px 8px; border-radius: 20px; font-size: 11px;
+
+  background: rgba(59,130,246,.15); color: #93c5fd;
+
+  border: 1px solid rgba(59,130,246,.3);
+
+}
+
+.type-tabs { display: flex; gap: 6px; margin-bottom: 8px; }
+
+.type-tab {
+
+  padding: 3px 12px; border-radius: 8px; font-size: 12px;
+
+  color: #555; border: 1px solid transparent; transition: all .15s;
+
+}
+
+.type-tab:hover { color: #ccc; }
+
+.type-tab.active { background: #1e1e1e; color: #fff; border-color: #444; }
+
+.input-row { display: flex; align-items: flex-end; gap: 8px; }
+
+#text-input {
+
+  flex: 1; background: #1a1a1a; border: 1px solid #252525;
+
+  border-radius: 12px; padding: 9px 12px; font-size: 13px;
+
+  color: #fff; outline: none; transition: border-color .15s;
+
+  resize: none; line-height: 1.5; min-height: 40px; max-height: 120px;
+
+}
+
+#text-input::placeholder { color: #444; }
+
+#text-input:focus { border-color: #333; }
+
+#send-btn {
+
+  padding: 9px 16px; border-radius: 12px; font-size: 13px;
+
+  font-weight: 600; background: #2563eb; color: #fff;
+
+  transition: all .15s; flex-shrink: 0;
+
+}
+
+#send-btn:hover { background: #3b82f6; }
+
+#send-btn:disabled { background: #1e1e1e; color: #444; cursor: not-allowed; }
+
+/* 마감일 바 */
+
+#deadline-bar {
+
+  display: flex; align-items: center; gap: 8px;
+
+  margin-top: 8px; flex-wrap: wrap;
+
+}
+
+#deadline-bar label { font-size: 11px; color: #555; }
+
+#dl-date-input, #dl-time-input {
+
+  background: #1a1a1a; border: 1px solid #2e2e2e; border-radius: 8px;
+
+  padding: 3px 8px; font-size: 11px; color: #ccc; outline: none;
+
+  color-scheme: dark; transition: border-color .15s;
+
+}
+
+#dl-date-input:focus, #dl-time-input:focus { border-color: #444; }
+
+#dl-clear-btn {
+
+  padding: 3px 10px; border-radius: 8px; font-size: 11px;
+
+  border: 1px solid rgba(239,68,68,.4); color: #f87171;
+
+  background: rgba(239,68,68,.08); transition: all .15s;
+
+}
+
+#dl-clear-btn:hover { background: rgba(239,68,68,.15); }
+
+/* 카테고리 팝업 */
+
+#cat-popup {
+
+  position: absolute; bottom: calc(100% + 8px); left: 14px;
+
+  width: 288px; background: #1a1a1a;
+
+  border: 1px solid #2e2e2e; border-radius: 16px;
+
+  box-shadow: 0 8px 32px rgba(0,0,0,.6);
+
+  padding: 14px; z-index: 100; display: none;
+
+}
+
+#cat-popup.show { display: block; }
+
+.popup-tabs { display: flex; gap: 6px; margin-bottom: 12px; }
+
+.popup-tab {
+
+  flex: 1; padding: 5px; border-radius: 8px; font-size: 12px;
+
+  text-align: center; border: 1px solid transparent; color: #666; transition: all .15s;
+
+}
+
+.popup-tab.active { background: #252525; color: #fff; border-color: #444; }
+
+.popup-label { font-size: 11px; color: #555; margin-bottom: 8px; }
+
+.popup-cats { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.popup-cat {
+
+  display: flex; align-items: center; gap: 5px;
+
+  padding: 5px 12px; border-radius: 20px; font-size: 12px;
+
+  background: #222; border: 1px solid #333; transition: all .15s;
+
+}
+
+.popup-cat:hover { border-color: #555; background: #2a2a2a; }
+
+/* ── 캘린더 뷰 ── */
+
+#cal-view {
+
+  flex: 1; overflow-y: auto; padding: 16px;
+
+  display: none; flex-direction: column; gap: 14px;
+
+}
+
+#cal-view.show { display: flex; }
+
+#cal-header {
+
+  display: flex; align-items: center; justify-content: space-between;
+
+}
+
+#cal-header h2 { font-size: 16px; font-weight: 700; }
+
+.cal-nav {
+
+  width: 32px; height: 32px; border-radius: 8px; font-size: 18px;
+
+  display: flex; align-items: center; justify-content: center;
+
+  color: #888; transition: all .15s;
+
+}
+
+.cal-nav:hover { background: #1e1e1e; color: #fff; }
+
+#cal-grid {
+
+  display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px;
+
+}
+
+.cal-dow {
+
+  text-align: center; font-size: 11px; color: #555;
+
+  padding: 4px 0; font-weight: 600;
+
+}
+
+.cal-day {
+
+  aspect-ratio: 1; border-radius: 10px;
+
+  display: flex; flex-direction: column;
+
+  align-items: center; justify-content: flex-start;
+
+  padding: 6px 2px 4px; cursor: pointer; transition: all .15s;
+
+  background: #1a1a1a; border: 1px solid transparent; position: relative;
+
+}
+
+.cal-day:hover { background: #222; border-color: #333; }
+
+.cal-day.today { border-color: #3b82f6; background: #1e2a45; }
+
+.cal-day.selected { background: #1e3a8a; border-color: #3b82f6; }
+
+.cal-day.other-month .cal-day-num { color: #333; }
+
+.cal-day-num { font-size: 12px; font-weight: 600; color: #ccc; line-height: 1; }
+
+.cal-day.today .cal-day-num { color: #60a5fa; }
+
+.cal-day.selected .cal-day-num { color: #fff; }
+
+.cal-dots {
+
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 2px; margin-top: 4px;
+
+}
+
+.cal-dot { width: 5px; height: 5px; border-radius: 50%; }
+
+#cal-selected-label {
+
+  font-size: 13px; color: #666; padding-bottom: 8px;
+
+  border-bottom: 1px solid #222;
+
+}
+
+#cal-items { display: flex; flex-direction: column; gap: 6px; }
+
+.cal-item {
+
+  display: flex; align-items: flex-start; gap: 8px;
+
+  background: #1a1a1a; border: 1px solid #252525;
+
+  border-radius: 10px; padding: 8px 10px;
+
+  position: relative; overflow: hidden;
+
+  transition: border-color .15s;
+
+}
+
+.cal-item:hover { border-color: #333; }
+
+.cal-color-bar { position: absolute; left: 0; top: 0; bottom: 0; width: 3px; }
+
+.cal-check {
+
+  width: 16px; height: 16px; border-radius: 50%;
+
+  border: 2px solid #444; flex-shrink: 0; margin-top: 2px;
+
+  display: flex; align-items: center; justify-content: center;
+
+  font-size: 9px; cursor: pointer; transition: all .15s;
+
+}
+
+.cal-check:hover { border-color: #888; }
+
+.cal-check.checked { border-color: transparent; color: #fff; }

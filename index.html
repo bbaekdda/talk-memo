@@ -507,7 +507,7 @@ function clearDeadline(){
 }
 function autoResize(el){el.style.height='auto';el.style.height=el.scrollHeight+'px';}
 function checkSendBtn(){document.getElementById('send-btn').disabled=!document.getElementById('text-input').value.trim();}
-function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMemo();}}
+function handleKey(e){if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing&&e.keyCode!==229){e.preventDefault();sendMemo();}}
 function sendMemo(){
   var txt=document.getElementById('text-input').value.trim();
   if(!txt)return;

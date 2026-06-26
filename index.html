@@ -71,13 +71,20 @@ textarea, input { font: inherit; color: inherit; }
 .card-actions { display: flex; flex-direction: column; gap: 4px; opacity: 0; transition: opacity .15s; }
 .item-card:hover .card-actions { opacity: 1; }
 .action-btn { font-size: 14px; padding: 2px; transition: color .15s; }
+.action-btn.edit { color: #ccc; }
+.action-btn.edit:hover { color: #2563eb; }
 .action-btn.fav { color: #ccc; }
 .action-btn.fav.on { color: #f59e0b; }
 .action-btn.del { color: #ddd; }
 .action-btn.del:hover { color: #ef4444; }
-#input-area { flex-shrink: 0; border-top: 1px solid #e5e7eb; background: #fff; padding: 10px 14px; position: relative; }
+#input-area { flex-shrink: 0; border-top: 1px solid #e5e7eb; background: #fff; padding: 12px 14px; position: relative; }
 .tag-preview { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; }
 .preview-tag { display: flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 20px; font-size: 11px; background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
+#deadline-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; padding: 8px 10px; background: #f8faff; border-radius: 10px; border: 1px solid #e0eaff; }
+#deadline-bar label { font-size: 11px; color: #888; }
+#dl-date-input, #dl-time-input { background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 3px 8px; font-size: 11px; color: #555; outline: none; transition: border-color .15s; }
+#dl-date-input:focus, #dl-time-input:focus { border-color: #93c5fd; }
+#dl-clear-btn { padding: 3px 10px; border-radius: 8px; font-size: 11px; border: 1px solid #fecaca; color: #ef4444; background: #fef2f2; margin-left: auto; }
 .input-row { display: flex; align-items: flex-end; gap: 8px; }
 #text-input { flex: 1; background: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 12px; padding: 9px 12px; font-size: 13px; color: #111; outline: none; transition: border-color .15s, background .15s; resize: none; line-height: 1.5; min-height: 40px; max-height: 120px; }
 #text-input::placeholder { color: #bbb; }
@@ -85,11 +92,6 @@ textarea, input { font: inherit; color: inherit; }
 #send-btn { padding: 9px 16px; border-radius: 12px; font-size: 13px; font-weight: 600; background: #2563eb; color: #fff; transition: all .15s; flex-shrink: 0; }
 #send-btn:hover { background: #1d4ed8; }
 #send-btn:disabled { background: #e5e7eb; color: #bbb; cursor: not-allowed; }
-#deadline-bar { display: flex; align-items: center; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
-#deadline-bar label { font-size: 11px; color: #aaa; }
-#dl-date-input, #dl-time-input { background: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 8px; padding: 3px 8px; font-size: 11px; color: #555; outline: none; transition: border-color .15s; }
-#dl-date-input:focus, #dl-time-input:focus { border-color: #93c5fd; }
-#dl-clear-btn { padding: 3px 10px; border-radius: 8px; font-size: 11px; border: 1px solid #fecaca; color: #ef4444; background: #fef2f2; }
 #cat-popup { position: absolute; bottom: calc(100% + 8px); left: 14px; width: 288px; background: #fff; border: 1px solid #e5e7eb; border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,.12); padding: 14px; z-index: 100; display: none; }
 #cat-popup.show { display: block; }
 .popup-tabs { display: flex; gap: 6px; margin-bottom: 12px; }
@@ -100,6 +102,27 @@ textarea, input { font: inherit; color: inherit; }
 .popup-cat { display: flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 20px; font-size: 12px; background: #f3f4f6; border: 1px solid #e5e7eb; color: #555; cursor: pointer; transition: all .15s; }
 .popup-cat:hover { border-color: #ccc; background: #e9ecf0; }
 .popup-cat.selected { border-color: #2563eb; background: #eff6ff; color: #2563eb; }
+#edit-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.3); z-index: 200; display: none; align-items: center; justify-content: center; }
+#edit-modal-overlay.show { display: flex; }
+#edit-modal { background: #fff; border-radius: 20px; padding: 24px; width: 420px; max-width: 90vw; box-shadow: 0 20px 60px rgba(0,0,0,.15); }
+.modal-title { font-size: 15px; font-weight: 700; color: #111; margin-bottom: 16px; }
+.modal-label { font-size: 11px; color: #aaa; font-weight: 600; margin-bottom: 6px; text-transform: uppercase; letter-spacing: .05em; }
+.modal-textarea { width: 100%; background: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 12px; padding: 10px 12px; font-size: 13px; color: #111; outline: none; resize: none; line-height: 1.6; min-height: 80px; transition: border-color .15s; }
+.modal-textarea:focus { border-color: #93c5fd; background: #fff; }
+.modal-section { margin-bottom: 16px; }
+.modal-cats { display: flex; flex-wrap: wrap; gap: 6px; }
+.modal-cat { display: flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 20px; font-size: 12px; background: #f3f4f6; border: 1px solid #e5e7eb; color: #555; cursor: pointer; transition: all .15s; }
+.modal-cat:hover { border-color: #ccc; }
+.modal-cat.selected { border-color: #2563eb; background: #eff6ff; color: #2563eb; }
+.modal-date-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.modal-date-input { background: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 8px; padding: 6px 10px; font-size: 12px; color: #555; outline: none; transition: border-color .15s; }
+.modal-date-input:focus { border-color: #93c5fd; background: #fff; }
+.modal-clear-dl { padding: 5px 10px; border-radius: 8px; font-size: 11px; border: 1px solid #fecaca; color: #ef4444; background: #fef2f2; }
+.modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
+.modal-cancel { padding: 8px 18px; border-radius: 10px; font-size: 13px; border: 1px solid #e5e7eb; color: #888; background: #f3f4f6; }
+.modal-cancel:hover { background: #e9ecf0; }
+.modal-save { padding: 8px 18px; border-radius: 10px; font-size: 13px; font-weight: 600; background: #2563eb; color: #fff; }
+.modal-save:hover { background: #1d4ed8; }
 #cal-view { flex: 1; overflow-y: auto; padding: 16px; display: none; flex-direction: column; gap: 14px; background: #f5f5f7; }
 #cal-view.show { display: flex; }
 #cal-header { display: flex; align-items: center; justify-content: space-between; }
@@ -240,13 +263,39 @@ textarea, input { font: inherit; color: inherit; }
     </div>
   </div>
 </div>
+<div id="edit-modal-overlay" onclick="closeEditModal(event)">
+  <div id="edit-modal">
+    <div class="modal-title">✏️ 메모 편집</div>
+    <div class="modal-section">
+      <div class="modal-label">내용</div>
+      <textarea class="modal-textarea" id="edit-text" rows="3"></textarea>
+    </div>
+    <div class="modal-section">
+      <div class="modal-label">카테고리</div>
+      <div class="modal-cats" id="edit-cats"></div>
+    </div>
+    <div class="modal-section">
+      <div class="modal-label">마감일</div>
+      <div class="modal-date-row">
+        <input type="date" class="modal-date-input" id="edit-dl-date"/>
+        <input type="time" class="modal-date-input" id="edit-dl-time"/>
+        <button class="modal-clear-dl" onclick="clearEditDeadline()">✕ 제거</button>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeEditModal()">취소</button>
+      <button class="modal-save" onclick="saveEdit()">저장</button>
+    </div>
+  </div>
+</div>
 <script>
-const SKEY='talkmemo_v2',CKEY='talkmemo_cats_v2',PKEY='talkmemo_settings';
-const CAT_COLORS=['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#06b6d4','#84cc16','#f97316','#6366f1'];
-let items=[],categories=[],settings={hideDone:false,showDivider:true};
-let selectedCats=[],selectedType='todo',dlDate='',dlTime='';
-let filterDoneOnly=false,filterCat='all',currentView='list';
-let calYear,calMonth,calSelectedDate,newCatColor=CAT_COLORS[0];
+var SKEY='talkmemo_v2',CKEY='talkmemo_cats_v2',PKEY='talkmemo_settings';
+var CAT_COLORS=['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#06b6d4','#84cc16','#f97316','#6366f1'];
+var items=[],categories=[],settings={hideDone:false,showDivider:true};
+var selectedCats=[],selectedType='todo',dlDate='',dlTime='';
+var filterDoneOnly=false,filterCat='all',currentView='list';
+var calYear,calMonth,calSelectedDate,newCatColor=CAT_COLORS[0];
+var editingId=null,editCats=[];
 
 function load(){
   try{items=JSON.parse(localStorage.getItem(SKEY))||[];}catch(e){items=[];}
@@ -299,7 +348,7 @@ function switchView(v){
   else if(v==='fav'){favEl.classList.add('show');catB.style.display='none';fBtn.style.display='none';renderFav();}
   else if(v==='settings'){setEl.classList.add('show');inp.style.display='none';srch.style.display='none';catB.style.display='none';fBtn.style.display='none';renderSettings();}
   updateStatBadge();
-}
+  }
 
 function renderCatBar(){
   var bar=document.getElementById('cat-bar');bar.innerHTML='';
@@ -371,10 +420,11 @@ function renderCard(it){
     +dlHtml
     +'<div class="card-meta">'
     +(it.cats[0]?'<span class="meta-cat"><span class="meta-dot" style="background:'+mc.color+'"></span>'+mc.name+'</span>':'')
-+'<span class="meta-time">'+fmtTime(it.createdAt)+'</span>'
+    +'<span class="meta-time">'+fmtTime(it.createdAt)+'</span>'
     +'</div>'
     +'</div>'
     +'<div class="card-actions">'
+    +'<button class="action-btn edit" onclick="openEditModal(\''+it.id+'\')" title="편집">✏️</button>'
     +'<button class="action-btn fav'+(it.fav?' on':'')+'" onclick="toggleFav(\''+it.id+'\')" title="즐겨찾기">★</button>'
     +'<button class="action-btn del" onclick="deleteItem(\''+it.id+'\')" title="삭제">🗑</button>'
     +'</div>'
@@ -497,6 +547,7 @@ function renderCalendar(){
   grid.innerHTML=html;
   renderCalItems();
 }
+function fmtDateShort(ts){var d=new Date(ts);return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
 function selectCalDay(ds){calSelectedDate=ds;renderCalendar();}
 function changeMonth(dir){
   calMonth+=dir;
@@ -573,6 +624,48 @@ function resetAll(){
   if(!confirm('모든 데이터를 초기화할까요? 복구할 수 없어요.'))return;
   items=[];categories=defaultCats();settings={hideDone:false,showDivider:true};
   save();switchView('list');
+}
+function openEditModal(id){
+  var it=items.find(function(i){return i.id===id;});if(!it)return;
+  editingId=id;editCats=it.cats.slice();
+  document.getElementById('edit-text').value=it.text;
+  document.getElementById('edit-dl-date').value=it.deadline||'';
+  document.getElementById('edit-dl-time').value=it.deadlineTime||'';
+  var el=document.getElementById('edit-cats');
+  el.innerHTML=categories.map(function(c){
+    return '<div class="modal-cat'+(editCats.indexOf(c.id)>-1?' selected':'')+'" onclick="toggleEditCat(\''+c.id+'\')">'
+      +'<span style="width:8px;height:8px;border-radius:50%;background:'+c.color+';display:inline-block;flex-shrink:0;margin-right:2px"></span>'+c.name+'</div>';
+  }).join('');
+  document.getElementById('edit-modal-overlay').classList.add('show');
+}
+function toggleEditCat(id){
+  var i=editCats.indexOf(id);
+  if(i>-1)editCats.splice(i,1);else editCats.push(id);
+  document.getElementById('edit-cats').querySelectorAll('.modal-cat').forEach(function(el,idx){
+    el.classList.toggle('selected',editCats.indexOf(categories[idx].id)>-1);
+  });
+}
+function clearEditDeadline(){
+  document.getElementById('edit-dl-date').value='';
+  document.getElementById('edit-dl-time').value='';
+}
+function saveEdit(){
+  var it=items.find(function(i){return i.id===editingId;});if(!it)return;
+  var txt=document.getElementById('edit-text').value.trim();
+  if(txt)it.text=txt;
+  it.cats=editCats.slice();
+  it.deadline=document.getElementById('edit-dl-date').value||null;
+  it.deadlineTime=document.getElementById('edit-dl-time').value||null;
+  save();
+  closeEditModal();
+  if(currentView==='list')renderList();
+  else if(currentView==='fav')renderFav();
+  else if(currentView==='cal')renderCalendar();
+}
+function closeEditModal(e){
+  if(e&&e.target!==document.getElementById('edit-modal-overlay'))return;
+  document.getElementById('edit-modal-overlay').classList.remove('show');
+  editingId=null;editCats=[];
 }
 document.addEventListener('click',function(e){
   var popup=document.getElementById('cat-popup');

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>채팅처럼 간편한 메모</title>
+<title>톡메모 - 채팅처럼 간편한 메모</title>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html, body, #app { height: 100%; }
@@ -13,8 +13,6 @@ textarea, input { font: inherit; color: inherit; }
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-thumb { background: #ddd; border-radius: 2px; }
 #app { display: flex; height: 100vh; overflow: hidden; }
-
-/* 사이드바 */
 #sidebar { width: 56px; flex-shrink: 0; background: #fff; border-right: 1px solid #e5e7eb; display: flex; flex-direction: column; align-items: center; padding: 12px 0; gap: 6px; }
 .logo-btn { width: 36px; height: 36px; background: #2563eb; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; margin-bottom: 8px; flex-shrink: 0; }
 .sidebar-btn { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #aaa; transition: all .15s; position: relative; }
@@ -22,11 +20,7 @@ textarea, input { font: inherit; color: inherit; }
 .sidebar-btn.active { background: #dbeafe; color: #2563eb; }
 .sidebar-spacer { flex: 1; }
 .badge { position: absolute; top: -3px; right: -3px; min-width: 16px; height: 16px; background: #2563eb; border-radius: 8px; font-size: 9px; font-weight: 700; color: #fff; display: flex; align-items: center; justify-content: center; padding: 0 3px; }
-
-/* 메인 */
 #main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
-
-/* 헤더 */
 #header { flex-shrink: 0; display: flex; align-items: center; gap: 10px; padding: 10px 16px; border-bottom: 1px solid #e5e7eb; background: #fff; }
 #header h1 { font-size: 15px; font-weight: 700; color: #111; }
 .stat-badge { padding: 2px 10px; border-radius: 20px; font-size: 11px; background: #f3f4f6; color: #888; border: 1px solid #e5e7eb; }
@@ -34,33 +28,23 @@ textarea, input { font: inherit; color: inherit; }
 #filter-btn { padding: 4px 10px; border-radius: 8px; font-size: 11px; border: 1px solid #e5e7eb; color: #888; transition: all .15s; background: #fff; }
 #filter-btn:hover { color: #333; border-color: #ccc; }
 #filter-btn.on { background: #eff6ff; border-color: #93c5fd; color: #2563eb; }
-
-/* 검색 */
 #search-bar { flex-shrink: 0; display: flex; align-items: center; padding: 8px 16px; border-bottom: 1px solid #f0f0f0; background: #fff; }
 #search-input { width: 100%; background: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 10px; padding: 7px 12px; font-size: 13px; color: #111; outline: none; transition: border-color .15s; }
 #search-input::placeholder { color: #bbb; }
 #search-input:focus { border-color: #93c5fd; background: #fff; }
-
-/* 카테고리 바 */
 #cat-bar { flex-shrink: 0; display: flex; align-items: center; gap: 6px; padding: 8px 16px; overflow-x: auto; border-bottom: 1px solid #f0f0f0; background: #fff; }
 #cat-bar::-webkit-scrollbar { display: none; }
 .cat-filter-btn { display: flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 20px; font-size: 12px; white-space: nowrap; border: 1px solid transparent; color: #aaa; transition: all .15s; background: #f3f4f6; }
 .cat-filter-btn:hover { color: #555; background: #e9ecf0; }
-.cat-filter-btn.active { color: #fff; background: transparent; }
+.cat-filter-btn.active { color: #fff; }
 .cat-dot { width: 6px; height: 6px; border-radius: 50%; }
-
-/* 리스트 */
 #list { flex: 1; overflow-y: auto; padding: 8px 16px; background: #f5f5f7; }
 .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: #ccc; text-align: center; }
 .empty-state .big { font-size: 48px; margin-bottom: 12px; }
 .empty-state p { font-size: 13px; margin-top: 4px; color: #bbb; }
-
-/* 날짜 구분선 */
 .date-divider { display: flex; align-items: center; gap: 10px; margin: 16px 0; }
 .date-divider::before, .date-divider::after { content: ''; flex: 1; height: 1px; background: #e5e7eb; }
 .date-divider span { font-size: 11px; color: #bbb; }
-
-/* 카드 */
 .item-card { position: relative; border-radius: 14px; background: #fff; border: 1px solid #e5e7eb; margin-bottom: 10px; overflow: hidden; animation: fadeUp .2s ease; transition: box-shadow .15s, border-color .15s; }
 .item-card:hover { border-color: #d1d5db; box-shadow: 0 2px 12px rgba(0,0,0,.06); }
 .item-card.done { opacity: .5; }
@@ -77,8 +61,8 @@ textarea, input { font: inherit; color: inherit; }
 .tag-row { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
 .tag-pill { padding: 1px 8px; border-radius: 20px; font-size: 11px; font-weight: 500; }
 .deadline-badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 9px; border-radius: 20px; font-size: 11px; margin-top: 5px; }
-.deadline-badge.overdue  { background: #fef2f2; color: #ef4444; border: 1px solid #fecaca; }
-.deadline-badge.today    { background: #fffbeb; color: #f59e0b; border: 1px solid #fde68a; }
+.deadline-badge.overdue { background: #fef2f2; color: #ef4444; border: 1px solid #fecaca; }
+.deadline-badge.today { background: #fffbeb; color: #f59e0b; border: 1px solid #fde68a; }
 .deadline-badge.upcoming { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
 .card-meta { display: flex; align-items: center; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
 .meta-cat { display: flex; align-items: center; gap: 4px; font-size: 11px; color: #999; }
@@ -91,8 +75,6 @@ textarea, input { font: inherit; color: inherit; }
 .action-btn.fav.on { color: #f59e0b; }
 .action-btn.del { color: #ddd; }
 .action-btn.del:hover { color: #ef4444; }
-
-/* 입력 영역 */
 #input-area { flex-shrink: 0; border-top: 1px solid #e5e7eb; background: #fff; padding: 10px 14px; position: relative; }
 .tag-preview { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; }
 .preview-tag { display: flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 20px; font-size: 11px; background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
@@ -103,16 +85,11 @@ textarea, input { font: inherit; color: inherit; }
 #send-btn { padding: 9px 16px; border-radius: 12px; font-size: 13px; font-weight: 600; background: #2563eb; color: #fff; transition: all .15s; flex-shrink: 0; }
 #send-btn:hover { background: #1d4ed8; }
 #send-btn:disabled { background: #e5e7eb; color: #bbb; cursor: not-allowed; }
-
-/* 마감일 바 */
 #deadline-bar { display: flex; align-items: center; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
 #deadline-bar label { font-size: 11px; color: #aaa; }
 #dl-date-input, #dl-time-input { background: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 8px; padding: 3px 8px; font-size: 11px; color: #555; outline: none; transition: border-color .15s; }
 #dl-date-input:focus, #dl-time-input:focus { border-color: #93c5fd; }
-#dl-clear-btn { padding: 3px 10px; border-radius: 8px; font-size: 11px; border: 1px solid #fecaca; color: #ef4444; background: #fef2f2; transition: all .15s; }
-#dl-clear-btn:hover { background: #fee2e2; }
-
-/* 카테고리 팝업 */
+#dl-clear-btn { padding: 3px 10px; border-radius: 8px; font-size: 11px; border: 1px solid #fecaca; color: #ef4444; background: #fef2f2; }
 #cat-popup { position: absolute; bottom: calc(100% + 8px); left: 14px; width: 288px; background: #fff; border: 1px solid #e5e7eb; border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,.12); padding: 14px; z-index: 100; display: none; }
 #cat-popup.show { display: block; }
 .popup-tabs { display: flex; gap: 6px; margin-bottom: 12px; }
@@ -123,8 +100,6 @@ textarea, input { font: inherit; color: inherit; }
 .popup-cat { display: flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 20px; font-size: 12px; background: #f3f4f6; border: 1px solid #e5e7eb; color: #555; cursor: pointer; transition: all .15s; }
 .popup-cat:hover { border-color: #ccc; background: #e9ecf0; }
 .popup-cat.selected { border-color: #2563eb; background: #eff6ff; color: #2563eb; }
-
-/* 캘린더 */
 #cal-view { flex: 1; overflow-y: auto; padding: 16px; display: none; flex-direction: column; gap: 14px; background: #f5f5f7; }
 #cal-view.show { display: flex; }
 #cal-header { display: flex; align-items: center; justify-content: space-between; }
@@ -152,12 +127,8 @@ textarea, input { font: inherit; color: inherit; }
 .cal-check.checked { border-color: transparent; color: #fff; }
 .cal-item-text { font-size: 12px; color: #444; line-height: 1.5; flex: 1; }
 .cal-item-time { font-size: 11px; color: #ccc; white-space: nowrap; }
-
-/* 즐겨찾기 */
 #fav-view { flex: 1; overflow-y: auto; padding: 8px 16px; display: none; background: #f5f5f7; }
 #fav-view.show { display: block; }
-
-/* 설정 */
 #settings-view { flex: 1; overflow-y: auto; padding: 20px; display: none; flex-direction: column; gap: 16px; background: #f5f5f7; }
 #settings-view.show { display: flex; }
 .setting-section { background: #fff; border: 1px solid #e5e7eb; border-radius: 14px; overflow: hidden; }
@@ -201,7 +172,7 @@ textarea, input { font: inherit; color: inherit; }
       <button id="filter-btn" onclick="toggleFilterDone()">✅ 미완료만</button>
     </div>
     <div id="search-bar">
-      <input id="search-input" placeholder="🔍  메모 검색" oninput="renderList()"/>
+      <input id="search-input" placeholder="🔍  메모 검색..." oninput="renderList()"/>
     </div>
     <div id="cat-bar"></div>
     <div id="list"></div>
@@ -254,7 +225,7 @@ textarea, input { font: inherit; color: inherit; }
         <div class="popup-label">카테고리 선택</div>
         <div class="popup-cats" id="popup-cats"></div>
       </div>
-      <div class="tag-preview" id="tag-preview"></div>
+      <div class="tag-preview" id="tag-preview" style="display:none;"></div>
       <div id="deadline-bar" style="display:none;">
         <label>📅 마감일</label>
         <input type="date" id="dl-date-input" oninput="renderTagPreview()"/>
@@ -263,26 +234,24 @@ textarea, input { font: inherit; color: inherit; }
       </div>
       <div class="input-row">
         <button id="cat-open-btn" onclick="toggleCatPopup()" title="카테고리/타입 선택" style="font-size:20px;color:#ccc;flex-shrink:0;padding:2px 4px;transition:color .15s;" onmouseover="this.style.color='#2563eb'" onmouseout="this.style.color='#ccc'">⊕</button>
-        <textarea id="text-input" placeholder="메모를 입력하세요... (Enter: 전송 / Shift+Enter: 줄바꿈)" rows="1"
-          oninput="autoResize(this);checkSendBtn()" onkeydown="handleKey(event)"></textarea>
+        <textarea id="text-input" placeholder="메모를 입력하세요... (Enter: 전송 / Shift+Enter: 줄바꿈)" rows="1" oninput="autoResize(this);checkSendBtn()" onkeydown="handleKey(event)"></textarea>
         <button id="send-btn" onclick="sendMemo()" disabled>전송</button>
       </div>
     </div>
   </div>
 </div>
 <script>
-const SKEY='talkmemo_v2', CKEY='talkmemo_cats_v2', PKEY='talkmemo_settings';
+const SKEY='talkmemo_v2',CKEY='talkmemo_cats_v2',PKEY='talkmemo_settings';
 const CAT_COLORS=['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#06b6d4','#84cc16','#f97316','#6366f1'];
-
-let items=[], categories=[], settings={hideDone:false,showDivider:true};
-let selectedCats=[], selectedType='todo', dlDate='', dlTime='';
-let filterDoneOnly=false, filterCat='all', currentView='list';
-let calYear, calMonth, calSelectedDate, newCatColor=CAT_COLORS[0];
+let items=[],categories=[],settings={hideDone:false,showDivider:true};
+let selectedCats=[],selectedType='todo',dlDate='',dlTime='';
+let filterDoneOnly=false,filterCat='all',currentView='list';
+let calYear,calMonth,calSelectedDate,newCatColor=CAT_COLORS[0];
 
 function load(){
-  try{items=JSON.parse(localStorage.getItem(SKEY))||[];}catch{items=[];}
-  try{categories=JSON.parse(localStorage.getItem(CKEY))||defaultCats();}catch{categories=defaultCats();}
-  try{const s=JSON.parse(localStorage.getItem(PKEY));if(s)settings={...settings,...s};}catch{}
+  try{items=JSON.parse(localStorage.getItem(SKEY))||[];}catch(e){items=[];}
+  try{categories=JSON.parse(localStorage.getItem(CKEY))||defaultCats();}catch(e){categories=defaultCats();}
+  try{var s=JSON.parse(localStorage.getItem(PKEY));if(s)settings=Object.assign({},settings,s);}catch(e){}
 }
 function save(){
   localStorage.setItem(SKEY,JSON.stringify(items));
@@ -297,127 +266,110 @@ function defaultCats(){
     {id:'학교',name:'학교',color:'#f59e0b'},
     {id:'약속',name:'약속',color:'#ef4444'},
     {id:'집안일',name:'집안일',color:'#8b5cf6'},
-    {id:'과제',name:'과제',color:'#ec4899'},
+    {id:'과제',name:'과제',color:'#ec4899'}
   ];
 }
-function getCat(id){return categories.find(c=>c.id===id)||{name:id,color:'#aaa'};}
+function getCat(id){return categories.find(function(c){return c.id===id;})||{name:id,color:'#aaa'};}
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2);}
 function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function pad(n){return String(n).padStart(2,'0');}
+function fmtDateShort(ts){var d=new Date(ts);return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
+function fmtDate(ts){return new Date(ts).toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric',weekday:'short'});}
+function fmtTime(ts){return new Date(ts).toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'});}
 
-// ── 뷰 전환
 function switchView(v){
   currentView=v;
-  document.querySelectorAll('.sidebar-btn').forEach(b=>b.classList.remove('active'));
-  const sb=document.getElementById('btn-'+v); if(sb)sb.classList.add('active');
-  const listEl=document.getElementById('list');
-  const calEl=document.getElementById('cal-view');
-  const favEl=document.getElementById('fav-view');
-  const setEl=document.getElementById('settings-view');
-  const inp=document.getElementById('input-area');
-  const srch=document.getElementById('search-bar');
-  const catB=document.getElementById('cat-bar');
-  const fBtn=document.getElementById('filter-btn');
+  document.querySelectorAll('.sidebar-btn').forEach(function(b){b.classList.remove('active');});
+  var sb=document.getElementById('btn-'+v);if(sb)sb.classList.add('active');
+  var listEl=document.getElementById('list');
+  var calEl=document.getElementById('cal-view');
+  var favEl=document.getElementById('fav-view');
+  var setEl=document.getElementById('settings-view');
+  var inp=document.getElementById('input-area');
+  var srch=document.getElementById('search-bar');
+  var catB=document.getElementById('cat-bar');
+  var fBtn=document.getElementById('filter-btn');
   listEl.style.display='none';
-  calEl.classList.remove('show'); favEl.classList.remove('show'); setEl.classList.remove('show');
-  srch.style.display=''; catB.style.display=''; fBtn.style.display=''; inp.style.display='';
-  document.getElementById('view-title').textContent=
-    v==='list'?'전체 메모':v==='cal'?'캘린더':v==='fav'?'즐겨찾기':'설정';
-  if(v==='list'){
-    listEl.style.display=''; renderCatBar(); renderList();
-  } else if(v==='cal'){
-    calEl.classList.add('show');
-    inp.style.display='none'; srch.style.display='none'; catB.style.display='none'; fBtn.style.display='none';
-    renderCalendar();
-  } else if(v==='fav'){
-    favEl.classList.add('show'); catB.style.display='none'; fBtn.style.display='none'; renderFav();
-  } else if(v==='settings'){
-    setEl.classList.add('show');
-    inp.style.display='none'; srch.style.display='none'; catB.style.display='none'; fBtn.style.display='none';
-    renderSettings();
-  }
+  calEl.classList.remove('show');favEl.classList.remove('show');setEl.classList.remove('show');
+  srch.style.display='';catB.style.display='';fBtn.style.display='';inp.style.display='';
+  var titles={list:'전체 메모',cal:'캘린더',fav:'즐겨찾기',settings:'설정'};
+  document.getElementById('view-title').textContent=titles[v]||'';
+  if(v==='list'){listEl.style.display='';renderCatBar();renderList();}
+  else if(v==='cal'){calEl.classList.add('show');inp.style.display='none';srch.style.display='none';catB.style.display='none';fBtn.style.display='none';renderCalendar();}
+  else if(v==='fav'){favEl.classList.add('show');catB.style.display='none';fBtn.style.display='none';renderFav();}
+  else if(v==='settings'){setEl.classList.add('show');inp.style.display='none';srch.style.display='none';catB.style.display='none';fBtn.style.display='none';renderSettings();}
   updateStatBadge();
 }
 
-// ── 카테고리 바
 function renderCatBar(){
-  const bar=document.getElementById('cat-bar'); bar.innerHTML='';
-  const mkBtn=(label,val,color)=>{
-    const b=document.createElement('button');
+  var bar=document.getElementById('cat-bar');bar.innerHTML='';
+  function mkBtn(label,val,color){
+    var b=document.createElement('button');
     b.className='cat-filter-btn'+(filterCat===val?' active':'');
     if(filterCat===val&&color){b.style.background=color;b.style.borderColor=color;}
-    b.innerHTML=val==='all'?label:`<span class="cat-dot" style="background:${color}"></span>${label}`;
-    b.onclick=()=>{filterCat=val;renderCatBar();renderList();};
+    if(val==='all'){b.textContent=label;}
+    else{b.innerHTML='<span class="cat-dot" style="background:'+color+'"></span>'+label;}
+    b.onclick=function(){filterCat=val;renderCatBar();renderList();};
     bar.appendChild(b);
-  };
+  }
   mkBtn('전체','all','#2563eb');
-  categories.forEach(c=>mkBtn(c.name,c.id,c.color));
+  categories.forEach(function(c){mkBtn(c.name,c.id,c.color);});
 }
 
-// ── 리스트 렌더
 function renderList(){
-  const el=document.getElementById('list');
-  const q=(document.getElementById('search-input').value||'').toLowerCase();
-  let list=items.filter(it=>{
+  var el=document.getElementById('list');
+  var q=(document.getElementById('search-input').value||'').toLowerCase();
+  var list=items.filter(function(it){
     if(filterDoneOnly&&it.done)return false;
     if(settings.hideDone&&it.done)return false;
-    if(filterCat!=='all'&&!it.cats.includes(filterCat))return false;
-    if(q&&!it.text.toLowerCase().includes(q))return false;
+    if(filterCat!=='all'&&it.cats.indexOf(filterCat)===-1)return false;
+    if(q&&it.text.toLowerCase().indexOf(q)===-1)return false;
     return true;
   });
   updateStatBadge();
   if(!list.length){
-    el.innerHTML=`<div class="empty-state"><div class="big">💬</div><p style="font-size:15px;color:#bbb;font-weight:600;">메모가 없어요</p><p>아래 입력창에서 새 메모를 추가해보세요</p></div>`;
+    el.innerHTML='<div class="empty-state"><div class="big">💬</div><p style="font-size:15px;color:#bbb;font-weight:600;">메모가 없어요</p><p>아래 입력창에서 새 메모를 추가해보세요</p></div>';
     return;
   }
-  let html='', lastDate='';
-  list.slice().reverse().forEach(it=>{
+  var html='',lastDate='';
+  list.slice().reverse().forEach(function(it){
     if(settings.showDivider){
-      const ds=fmtDate(it.createdAt);
-      if(ds!==lastDate){html+=`<div class="date-divider"><span>${ds}</span></div>`;lastDate=ds;}
+      var ds=fmtDate(it.createdAt);
+      if(ds!==lastDate){html+='<div class="date-divider"><span>'+ds+'</span></div>';lastDate=ds;}
     }
     html+=renderCard(it);
   });
   el.innerHTML=html;
 }
 
-function fmtDate(ts){
-  return new Date(ts).toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric',weekday:'short'});
-}
-function fmtTime(ts){
-  return new Date(ts).toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'});
-}
-
 function renderCard(it){
-  const mc=it.cats[0]?getCat(it.cats[0]):{name:'',color:'#ddd'};
-  let dlHtml='';
+  var mc=it.cats[0]?getCat(it.cats[0]):{name:'',color:'#ddd'};
+  var dlHtml='';
   if(it.deadline){
-    const dl=new Date(it.deadline),now=new Date();
-    const diff=dl-now,dd=Math.floor(diff/86400000);
-    let cls='upcoming',txt='';
+    var dl=new Date(it.deadline),now=new Date();
+    var diff=dl-now,dd=Math.floor(diff/86400000);
+    var cls='upcoming',txt='';
     if(diff<0){cls='overdue';txt='⚠️ 마감 지남';}
     else if(dd===0){cls='today';txt='🔔 오늘 마감';}
-    else{txt=`📅 ${dl.toLocaleDateString('ko-KR',{month:'short',day:'numeric'})}${it.deadlineTime?' '+it.deadlineTime:''}`;}
-    dlHtml=`<div class="deadline-badge ${cls}">${txt}</div>`;
+    else{txt='📅 '+dl.toLocaleDateString('ko-KR',{month:'short',day:'numeric'})+(it.deadlineTime?' '+it.deadlineTime:'');}
+    dlHtml='<div class="deadline-badge '+cls+'">'+txt+'</div>';
   }
-  const tagsHtml=it.cats.map(cid=>{
-    const c=getCat(cid);
-    return `<span class="tag-pill" style="background:${c.color}18;color:${c.color};border:1px solid ${c.color}44">${c.name}</span>`;
+  var tagsHtml=it.cats.map(function(cid){
+    var c=getCat(cid);
+    return '<span class="tag-pill" style="background:'+c.color+'18;color:'+c.color+';border:1px solid '+c.color+'44">'+c.name+'</span>';
   }).join('');
-  const checkOrIcon=it.type==='todo'
-    ?`<button class="check-btn${it.done?' checked':''}" onclick="toggleDone('${it.id}')" style="${it.done?'background:'+mc.color+';':''}">${it.done?'✓':''}</button>`
-    :`<span class="memo-icon">📝</span>`;
-  return `<div class="item-card${it.done?' done':''}" id="card-${it.id}">
-    <div class="color-bar" style="background:${mc.color}"></div>
-    <div class="card-inner">
-      ${checkOrIcon}
-      <div class="card-body">
-        <div class="card-text${it.done?' done-text':''}">${escHtml(it.text)}</div>
-        ${tagsHtml?`<div class="tag-row">${tagsHtml}</div>`:''}
-        ${dlHtml}
-        <div class="card-meta">
-          ${it.cats[0]?`<span class="meta-cat"><span class="meta-dot" style="background:${mc.color}"></span>${mc.name}</span>`:''}
-          <span class="meta-time">${fmtTime(it.createdAt)}</span>
-        </div>
-      </div>
-      <div class="card-actions">
-        <button class="action-btn fav${it.fav?' on':''}" onclick="toggleF
+  var checkOrIcon=it.type==='todo'
+    ?'<button class="check-btn'+(it.done?' checked':'')+'" onclick="toggleDone(\''+it.id+'\')" style="'+(it.done?'background:'+mc.color+';':'')+'">'+( it.done?'✓':'')+'</button>'
+    :'<span class="memo-icon">📝</span>';
+  return '<div class="item-card'+(it.done?' done':'')+'" id="card-'+it.id+'">'
+    +'<div class="color-bar" style="background:'+mc.color+'"></div>'
+    +'<div class="card-inner">'
+    +checkOrIcon
+    +'<div class="card-body">'
+    +'<div class="card-text'+(it.done?' done-text':'')+'">'+escHtml(it.text)+'</div>'
+    +(tagsHtml?'<div class="tag-row">'+tagsHtml+'</div>':'')
+    +dlHtml
+    +'<div class="card-meta">'
+    +(it.cats[0]?'<span class="meta-cat"><span class="meta-dot" style="background:'+mc.color+'"></span>'+mc.name+'</span>':'')
+    +'<span class="meta-time">'+fmtTime(it.createdAt)+'</span>'
+    +'
